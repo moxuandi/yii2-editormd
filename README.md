@@ -1,4 +1,4 @@
-[开源在线 Markdown 编辑器 Editor.md for Yii2](https://pandao.github.io/editor.md/)
+[开源在线 Markdown 编辑器 Editor.md for Yii2](http://editor.md.ipandao.com/)
 ================
 
 ### 主要特性
