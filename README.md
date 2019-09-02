@@ -28,11 +28,6 @@ composer require moxuandi/yii2-editormd:"dev-master"
 使用:
 -----
 
-在`Controller`中添加:
-```php
-
-```
-
 在`View`中添加:
 ```php
 1. 简单调用:
@@ -43,6 +38,8 @@ $form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
     'editorOptions' => [
         'width' => '100%',
         'height' => 640,
+        'imageUpload' => true,  // 启用图片上传
+        'watch' => false,  // 关闭实时预览
     ],
 ]);
 
@@ -57,6 +54,70 @@ $form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
 ]);
 ```
 
+在`Controller`中添加(如果不需要图片上传功能, 可以不添加):
+```php
+public function actions()
+{
+    return [
+        'EditormdUpload' => [
+            'class' => 'moxuandi\editormd\UploaderAction',
+            'config' => [
+                'imageMaxSize' => 1*1024*1024,  // 上传大小限制, 单位B, 默认1MB, 注意修改服务器的大小限制
+                'imageAllowFiles' => ['.jpg', '.jpeg', '.gif', '.png', '.bmp', '.webp'],  // 允许上传的文件类型
+                'imagePathFormat' => '/uploads/image/{yyyy}{mm}{dd}/{hh}{ii}{ss}_{rand:6}',  // 文件保存路径
+                'saveDatabase' => false,  // 文件信息是否保存入库
+                'process' => [  // 二维数组, 将按照子数组的顺序对图片进行处理
+                    'match' => ['image', 'process'],  // 图片处理后保存路径的替换规则, 必须是两个元素的数组
+                    'thumb' => [  // 缩略图配置
+                        'width' => 300,  // 缩略图宽度
+                        'height' => 200,  // 缩略图高度
+                        'mode' => 'outbound',  // 生成缩略图的模式, 可用值: 'inset'(补白), 'outbound'(裁剪, 默认值)
+                    ],
+                    'crop' => [  // 裁剪图配置
+                        'width' => 300,  // 裁剪图的宽度
+                        'height' => 200,  // 裁剪图的高度
+                        'top' => 200,  // 裁剪图顶部的偏移, y轴起点, 默认为`0`
+                        'left' => 200,  // 裁剪图左侧的偏移, x轴起点, 默认为`0`
+                    ],
+                    'frame' => [  // 添加边框的配置
+                        'margin' => 20,  // 边框的宽度, 默认为`20`
+                        'color' => '666',  // 边框的颜色, 十六进制颜色编码, 可以不带`#`, 默认为`666`
+                        'alpha' => 100,  // 边框的透明度, 可能仅`png`图片生效, 默认为`100`
+                    ],
+                    'watermark' => [  // 添加图片水印的配置
+                        'watermarkImage' => '/uploads/watermark.png',  // 水印图片的绝对路径
+                        'top' => 100,  // 水印图片的顶部距离原图顶部的偏移, y轴起点, 默认为`0`
+                        'left' => 200,  // 水印图片的左侧距离原图左侧的偏移, x轴起点, 默认为`0`
+                    ],
+                    'text' => [  // 添加文字水印的配置
+                        'text' => 'TONGMENGCMS',  // 水印文字的内容
+                        'fontFile' => '@yii/captcha/SpicyRice.ttf',  // 字体文件, 可以是绝对路径或别名
+                        'top' => 100,  // 水印文字距离原图顶部的偏移, y轴起点, 默认为`0`
+                        'left' => 200,  // 水印文字距离原图左侧的偏移, x轴起点, 默认为`0`
+                        'fontOptions' => [  // 字体属性
+                            'size' => 12,  // 字体的大小, 单位像素(`px`), 默认为`12`
+                            'color' => 'fff',  // 字体的颜色, 十六进制颜色编码, 可以不带`#`, 默认为`fff`
+                            'angle' => 0,  // 写入文本的角度, 默认为`0`
+                        ],
+                    ],
+                    'resize' => [  // 调整图片大小的配置
+                        'width' => 300,  // 图片调整后的宽度
+                        'height' => 200,  // 图片调整后的高度
+                        'keepAspectRatio' => true,  // 是否保持图片纵横比, 默认为`true`
+                        'allowUpscaling' => false,  // 如果原图很小, 图片是否放大, 默认为`false`
+                    ],
+                ],
+
+                // 如果`uploads`目录与当前应用的入口文件不在同一个目录, 必须做如下配置:
+                'rootPath' => dirname(dirname(Yii::$app->request->scriptFile)),
+                'rootUrl' => 'http://image.advanced.ccc',
+            ],
+        ],
+    ];
+}
+```
+
+
 编辑器相关配置，请在视图`view`中配置，参数为`editorOptions`，比如定制菜单，编辑器大小等等，[可用配置项](https://github.com/pandao/editor.md/blob/master/editormd.js#L91)如下:
 
 | 配置项 | 类型 | 默认值 | 配置说明 |
@@ -64,7 +125,7 @@ $form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
 | mode | string | "gfm" |  |
 | name | string | "" |  |
 | value | string | "" |  |
-| theme | string | "" |  |
+| theme | string | "" | 主题 |
 | editorTheme | string | "default" |  |
 | previewTheme | string | "" |  |
 | markdown | string | "" |  |
@@ -73,17 +134,17 @@ $form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
 | height | string | "100%" |  |
 | path | string | "./lib/" |  |
 | pluginPath | string | "" |  |
-| delay | int | 300 |  |
-| autoLoadModules | bool | true |  |
-| watch | bool | true |  |
+| delay | int | 300 | 延迟解析标记为HTML, 单位:ms |
+| autoLoadModules | bool | true | 自动加载相关模块文件 |
+| watch | bool | true | 是否开启实时预览 |
 | placeholder | string | "Enjoy Markdown! coding now..." |  |
 | gotoLine | bool | true |  |
 | codeFold | bool | false |  |
 | autoHeight | bool | false |  |
-| autoFocus | bool | true |  |
+| autoFocus | bool | true | 是否启用自动对焦编辑器左侧输入区域 |
 | autoCloseTags | bool | true |  |
-| searchReplace | bool | true |  |
-| syncScrolling | bool | true |  |
+| searchReplace | bool | true | 是否启用搜索和替换功能 |
+| syncScrolling | bool | true | 同步滚动, "single"表示单向同步 |
 | readOnly | bool | false |  |
 | tabSize | int | 4 |  |
 | indentUnit | int | 4 |  |
@@ -115,11 +176,11 @@ $form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
 | onfullscreenExit | function | function() {} |  |
 | onscroll | function | function() {} |  |
 | onpreviewscroll | function | function() {} |  |
-| imageUpload | bool | false |  |
-| imageFormats | array | ["jpg", "jpeg", "gif", "png", "bmp", "webp"] |  |
-| imageUploadURL | string | "" |  |
-| crossDomainUpload | bool | false |  |
-| uploadCallbackURL | string | "" |  |
+| imageUpload | bool | false | 是否启用图片上传 |
+| imageFormats | array | ["jpg", "jpeg", "gif", "png", "bmp", "webp"] | 允许上传的图片格式 |
+| imageUploadURL | string | "" | 后端接收图片上传的URL |
+| crossDomainUpload | bool | false | 是否启用跨域上传 |
+| uploadCallbackURL | string | "" | 跨域上传的回调URL |
 | toc | bool | true |  |
 | tocm | bool | false |  |
 | tocTitle | string | "" |  |

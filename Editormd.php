@@ -6,6 +6,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\widgets\InputWidget;
 
 /**
@@ -40,6 +41,7 @@ class Editormd extends InputWidget
             'width' => '100%',
             'height' => 640,
             'path' => Yii::$app->assetManager->getBundle(EditormdAsset::class)->baseUrl . '/dist/lib/',
+            'imageUploadURL' => Url::to(['EditormdUpload']),
         ], $this->editorOptions);
         $this->nestingOptions = array_merge([
             'id' => 'nesting_' . $this->id,
