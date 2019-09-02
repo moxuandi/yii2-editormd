@@ -18,8 +18,8 @@
 使用 [composer](http://getcomposer.org/download/) 下载:
 ```
 # 2.2.x(yii >= 2.0.24):
-composer require moxuandi/yii2-kindeditor:"~2.2.0"
+composer require moxuandi/yii2-editormd:"~2.2.0"
 
 # 开发版:
-composer require moxuandi/yii2-kindeditor:"dev-master"
+composer require moxuandi/yii2-editormd:"dev-master"
 ```
