@@ -52,6 +52,20 @@ $form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
         'height' => 640,
     ]
 ]);
+
+4. 注册js函数和对象:
+$form->field($model, 'content')->widget('moxuandi\editormd\Editormd', [
+    'editorOptions' => [
+        'width' => '100%',
+        'height' => 640,
+        'toolbarIcons' => new \yii\web\JsExpression('function() {
+   return ["save", "undo", "redo", "bold", "italic", "del", "quote", "hr", "image", "link", "list-ul", "list-ol", "code", "code-block", "table"]
+}'),
+        'toolbarCustomIcons' => new \yii\web\JsExpression('{
+    save: "<a><i class=\"fa fa-save\" onclick=\"javascript:save();\"></i></a>"
+}'),
+    ],
+]);
 ```
 
 在`Controller`中添加(如果不需要图片上传功能, 可以不添加):
