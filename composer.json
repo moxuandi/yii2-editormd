@@ -1,0 +1,21 @@
+{
+    "name": "moxuandi/yii2-editormd",
+    "description": "开源在线 Markdown 编辑器",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension","Editor.md","Markdown 编辑器","在线编辑器","html编辑器","富文本编辑器"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "moxuandi",
+            "email": "1104984259@qq.com"
+        }
+    ],
+    "require": {
+        "moxuandi/yii2-helpers": "~2.2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "moxuandi\\editormd\\": ""
+        }
+    }
+}
