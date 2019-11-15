@@ -37,7 +37,6 @@ class UploaderAction extends Action
     }
 
     /**
-     * @throws yii\base\ErrorException
      * @throws yii\base\Exception
      */
     public function run()
@@ -48,19 +47,11 @@ class UploaderAction extends Action
         // 输出响应结果
         $response = Yii::$app->response;
         $response->format = Response::FORMAT_JSON;
-        if($upload->stateInfo == 'SUCCESS'){
-            $response->data = [
-                'success' => 1,
-                'message' => $upload->stateInfo,
-                'url' => $upload->fullName,
-            ];
-        }else{
-            $response->data = [
-                'success' => 0,
-                'message' => $upload->stateInfo,
-                'url' => $upload->fullName,
-            ];
-        }
+        $response->data = [
+            'success' => $upload->status ? 0 : 1,  // 0:表示上传失败; 1:表示上传成功
+            'message' => Uploader::$stateMap[$upload->status],
+            'url' => $upload->fullName,
+        ];
         $response->send();
     }
 }

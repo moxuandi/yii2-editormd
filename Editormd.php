@@ -54,15 +54,14 @@ class Editormd extends InputWidget
      */
     public function run()
     {
-        self::registerScript();
-        $tag = ArrayHelper::remove($this->nestingOptions, 'tag', 'div');
-        return Html::tag($tag, $this->hasModel() ? Html::activeTextarea($this->model, $this->attribute, $this->options) : Html::textarea($this->name, $this->value, $this->options), $this->nestingOptions);
+        $this->registerScript();
+        return Html::tag(ArrayHelper::remove($this->nestingOptions, 'tag', 'div'), $this->hasModel() ? Html::activeTextarea($this->model, $this->attribute, $this->options) : Html::textarea($this->name, $this->value, $this->options), $this->nestingOptions);
     }
 
     /**
      * 注册客户端脚本
      */
-    protected function registerScript()
+    public function registerScript()
     {
         EditormdAsset::register($this->view);
         $editorOptions = Json::encode($this->editorOptions);
